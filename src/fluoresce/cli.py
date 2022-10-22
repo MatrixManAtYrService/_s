@@ -6,11 +6,11 @@ import pkg_resources
 from fluoresce.main import (
     display_mode,
     paint_mode,
-    paint_mode,
     regex_mode,
     manage_colors,
     query_mode,
 )
+
 from fluoresce.try_stdin import try_stdin
 
 
@@ -70,7 +70,12 @@ def version():
     is_flag=True,
     default=False,
 )
-def fluoresce(version, help, paint, query, manage, colors):
+@click.option(
+    "--data-file",
+    "-f",
+    default=None
+)
+def fluoresce(version, help, paint, query, manage, colors, data_file):
 
     if version:
         version()
@@ -81,18 +86,23 @@ def fluoresce(version, help, paint, query, manage, colors):
     if manage:
         manage_colors()
 
-    data = try_stdin()
+    if data_file:
+        with open(data_file, 'r') as f:
+            data = str(f.read())
+    else:
+        data = try_stdin()
+
     if data:
         if not (paint or query):
             display_mode(data)
             exit(0)
 
         elif paint:
-            paint_mode(data)
+            paint_mode(data, colors)
             exit(0)
 
         elif query:
-            query_mode(data)
+            query_mode(data, colors)
             exit(0)
 
         else:
