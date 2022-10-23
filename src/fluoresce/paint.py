@@ -27,12 +27,12 @@ dummy_colors = {
     "foo": Style(color="black", bgcolor="red"),
     "bar": Style(color="black", bgcolor="blue"),
     "baz": Style(color="black", bgcolor="green"),
-    "qux": Style(color="white", bgcolor="red"),
-    "quux": Style(color="white", bgcolor="blue"),
-    "wakka": Style(color="black", bgcolor="green"),
-    "bang": Style(color="red", bgcolor="blue"),
-    "splat": Style(color="blue", bgcolor="green"),
-    "antidisestablishmentarianism": Style(color="green", bgcolor="red"),
+    #    "qux": Style(color="white", bgcolor="red"),
+    #    "quux": Style(color="white", bgcolor="blue"),
+    #    "wakka": Style(color="black", bgcolor="green"),
+    #    "bang": Style(color="red", bgcolor="blue"),
+    #    "splat": Style(color="blue", bgcolor="green"),
+    #    "antidisestablishmentarianism": Style(color="green", bgcolor="red"),
 }
 
 
@@ -89,12 +89,13 @@ class MessageArea(Placeholder):
     pass
 
 
-class Editor(Container):
+class Editor(Grid):
 
     DEFAULT_CSS = """
         Editor {
             align: center top;
             max-width: 120;
+            grid-size: 1;
         }
         TopBar {
             dock: top;
