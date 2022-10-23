@@ -1,10 +1,18 @@
 from textual.app import App, ComposeResult
 from textual.containers import Container, Horizontal
 from textual.widgets import Placeholder, Static
-from rich.console import Console, ConsoleOptions, RenderResult, ConsoleRenderable
-from rich.text import Text
-from itertools import cycle
-from dataclasses import dataclass
+from textual.widget import Widget
+from rich.console import (
+    Console,
+    ConsoleOptions,
+    RenderableType,
+)
+from rich.align import Align
+from rich.style import Style
+from rich.segment import Segment
+from rich.measure import Measurement
+from rich.panel import Panel
+from copy import deepcopy
 
 dummy_content = """
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla fringilla varius urna vitae porttitor. Praesent ligula nisl, tincidunt vitae bibendum id, interdum sed nibh. Vivamus fermentum, tortor vitae tempus vestibulum, elit mi interdum risus, id porttitor magna odio et dui. Cras sit amet eros tempus neque congue venenatis vel non neque. Morbi rutrum sit amet lorem eu tempor. Suspendisse potenti. Praesent sagittis arcu a rhoncus suscipit. Maecenas rutrum sem nec eros vehicula accumsan. Duis diam lacus, laoreet ullamcorper lorem et, suscipit fermentum magna. Integer gravida leo quis magna congue fringilla. Sed sed justo ex.
@@ -15,14 +23,38 @@ Aliquam sollicitudin accumsan lacus, sit amet rutrum quam sodales nec. Sed ut ul
 """
 
 
-@dataclass
-class Color:
-    small: str
-    medium: str
-    large: str
+dummy_colors = {
+    "red": Style(color="black", bgcolor="red"),
+    "blue": Style(color="black", bgcolor="blue"),
+    "green": Style(color="black", bgcolor="green"),
+}
 
 
-dummy_colors = ["red:1", "blue:2", "green:*"]
+class ColorIndicator(Widget):
+    def __init__(self, index, color, style):
+        super().__init__(name=f"color_{index}")
+        self.height = 1
+        self.index = index
+        self.color = color
+        self.base_style = style
+        self.selected = False
+
+    def __rich_console__(self, console: Console, options: ConsoleOptions):
+        if self.selected:
+            style: Style = deepcopy(self.base_style)
+            style.bold = True
+            istyle = Style(bold=True)
+        else:
+            istyle = Style()
+            style = self.base_style
+        yield Segment(f"{self.index}", istyle)
+        yield Segment(f"{self.color}", style)
+
+    def __rich_measure__(self, console: Console, options: ConsoleOptions):
+        return Measurement(5, 5)
+
+    def render(self) -> RenderableType:
+        return Panel(Align.center(self))
 
 
 class ViewToggle(Placeholder):
@@ -33,8 +65,13 @@ class ActionToggle(Placeholder):
     pass
 
 
-class ColorList(Placeholder):
-    pass
+class ColorList(Horizontal):
+    def __init__(self, colors):
+        indicators = [
+            ColorIndicator(i + 1, color, style)
+            for i, (color, style) in enumerate(colors.items())
+        ]
+        super().__init__(*indicators, id="color_list")
 
 
 class TopBar(Placeholder):
@@ -60,7 +97,7 @@ class Editor(Container):
             dock: top;
             align: center top;
             width: 100%;
-            height: 10%;
+            height: 5%;
         }
         ViewToggle {
             dock: right;
@@ -71,7 +108,11 @@ class Editor(Container):
             width: 10;
         }
         ColorList {
+            align: center middle;
+        }
+        ColorIndicator {
             width: 10;
+            align: center middle;
         }
         ContentArea {
             dock: left;
@@ -89,7 +130,7 @@ class Editor(Container):
 
     def __init__(self, content=dummy_content, colors=dummy_colors):
         super().__init__(
-            TopBar(ViewToggle(), ColorList(), ActionToggle()),
+            TopBar(ViewToggle(), ColorList(dummy_colors), ActionToggle()),
             ContentArea(dummy_content),
             MessageArea(),
         )
