@@ -1,5 +1,5 @@
 from textual.app import App, ComposeResult
-from textual.containers import Container, Horizontal
+from textual.containers import Container, Horizontal, Grid
 from textual.widgets import Placeholder, Static
 from textual.widget import Widget
 from rich.console import (
@@ -24,9 +24,15 @@ Aliquam sollicitudin accumsan lacus, sit amet rutrum quam sodales nec. Sed ut ul
 
 
 dummy_colors = {
-    "red": Style(color="black", bgcolor="red"),
-    "blue": Style(color="black", bgcolor="blue"),
-    "green": Style(color="black", bgcolor="green"),
+    "foo": Style(color="black", bgcolor="red"),
+    "bar": Style(color="black", bgcolor="blue"),
+    "baz": Style(color="black", bgcolor="green"),
+    "qux": Style(color="white", bgcolor="red"),
+    "quux": Style(color="white", bgcolor="blue"),
+    "wakka": Style(color="black", bgcolor="green"),
+    "bang": Style(color="red", bgcolor="blue"),
+    "splat": Style(color="blue", bgcolor="green"),
+    "antidisestablishmentarianism": Style(color="green", bgcolor="red"),
 }
 
 
@@ -50,9 +56,6 @@ class ColorIndicator(Widget):
         yield Segment(f"{self.index}", istyle)
         yield Segment(f"{self.color}", style)
 
-    def __rich_measure__(self, console: Console, options: ConsoleOptions):
-        return Measurement(5, 5)
-
     def render(self) -> RenderableType:
         return Panel(Align.center(self))
 
@@ -65,7 +68,7 @@ class ActionToggle(Placeholder):
     pass
 
 
-class ColorList(Horizontal):
+class ColorList(Grid):
     def __init__(self, colors):
         indicators = [
             ColorIndicator(i + 1, color, style)
@@ -97,28 +100,31 @@ class Editor(Container):
             dock: top;
             align: center top;
             width: 100%;
-            height: 5%;
+            height: 6;
         }
         ViewToggle {
             dock: right;
             width: 10;
+            height: 3;
         }
         ActionToggle {
             dock: left;
             width: 10;
+            height: 3;
         }
         ColorList {
-            align: center middle;
+            align: center top;
+            grid-size: 5;
         }
         ColorIndicator {
             width: 10;
-            align: center middle;
+            height: 3;
+            align: center top;
         }
         ContentArea {
-            dock: left;
             align: left middle;
             width: 100%;
-            height: 80%;
+            height: 50;
         }
         MessageArea {
             dock: bottom;
