@@ -138,7 +138,7 @@ class Editor(Grid):
     def __init__(self, content=dummy_content, colors=dummy_colors):
         super().__init__(
             TopBar(ViewToggle(), ColorList(dummy_colors), ActionToggle()),
-            ContentArea(dummy_content),
+            Container(ContentArea(dummy_content)),
             MessageArea(),
         )
 
